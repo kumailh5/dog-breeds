@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/screen_breeds_list">
+
+    <fragment
+        android:id="@+id/screen_breeds_list"
+        android:name="com.kumail.dogbreeds.ui.breedslist.BreedsListFragment"
+        tools:layout="@layout/fragment_breeds_list">
+
+        <action
+            android:id="@+id/action_breeds_list_to_breed_images"
+            app:destination="@id/screen_breed_images" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/screen_breed_images"
+        android:name="com.kumail.dogbreeds.ui.breedimages.BreedImagesFragment"
+        tools:layout="@layout/fragment_breed_images">
+
+        <argument
+            android:name="breed"
+            app:argType="string" />
+        <argument
+            android:name="subBreed"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+</navigation>

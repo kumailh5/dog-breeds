@@ -1,0 +1,20 @@
+<resources>
+
+    <string name="app_name">Dog Breeds</string>
+
+    <!--    UI strings-->
+    <string name="breeds_list">List of Breeds</string>
+    <string name="breed_images">Images of Breed</string>
+    <string name="search">Search</string>
+    <string name="ok">Okay</string>
+
+    <!--    Error strings-->
+    <string name="error">Error</string>
+    <string name="error_something_went_wrong">Something went wrong</string>
+    <string name="error_access_denied">Access denied</string>
+    <string name="error_service_unavailable">Service unavailable</string>
+    <string name="error_invalid_host">Unable to connect host</string>
+    <string name="error_not_found">Not found</string>
+    <string name="somethings_gone_wrong">Something has gone wrong, Please try again later!</string>
+
+</resources>

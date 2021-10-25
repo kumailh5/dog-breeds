@@ -3,7 +3,6 @@ package com.kumail.dogbreeds.network
 import com.kumail.dogbreeds.data.model.ErrorResponse
 import com.kumail.dogbreeds.util.parseErrorJson
 import retrofit2.Response
-import java.lang.Exception
 
 /**
  * Created by kumailhussain on 14/10/2021.

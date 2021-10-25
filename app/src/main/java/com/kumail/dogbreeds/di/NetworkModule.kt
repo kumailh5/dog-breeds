@@ -2,8 +2,6 @@ package com.kumail.dogbreeds.di
 
 import com.kumail.dogbreeds.BuildConfig
 import com.kumail.dogbreeds.data.repository.BreedApi
-import com.kumail.dogbreeds.data.repository.BreedRepository
-import com.kumail.dogbreeds.data.repository.BreedRepositoryImpl
 import com.kumail.dogbreeds.util.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -51,9 +49,4 @@ class NetworkModule {
     @Singleton
     fun provideBreedApi(retrofit: Retrofit): BreedApi =
         retrofit.create(BreedApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideBreedsListRepository(breedRepository: BreedRepositoryImpl): BreedRepository =
-        breedRepository
 }

@@ -1,10 +1,10 @@
 package com.kumail.dogbreeds.util
 
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.kumail.dogbreeds.data.model.ErrorResponse
-import android.widget.ImageView
 
 
 /**

@@ -2,7 +2,6 @@ package com.kumail.dogbreeds.util
 
 import android.content.Context
 import android.content.DialogInterface
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.kumail.dogbreeds.R
 

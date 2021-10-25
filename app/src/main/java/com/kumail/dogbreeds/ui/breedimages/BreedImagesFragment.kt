@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.kumail.dogbreeds.R
 import com.kumail.dogbreeds.databinding.FragmentBreedImagesBinding
 import com.kumail.dogbreeds.util.setToolbarTitle
@@ -17,6 +19,7 @@ import com.kumail.dogbreeds.util.showErrorDialog
 import com.kumail.dogbreeds.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 /**
  * Created by kumailhussain on 12/10/2021.
@@ -85,6 +88,15 @@ class BreedImagesFragment : Fragment() {
     }
 
     private fun setupBreedImages(listView: RecyclerView) {
+
+        val smoothScroller: SmoothScroller =
+            object : LinearSmoothScroller(requireContext()) {
+                override fun getVerticalSnapPreference(): Int {
+                    return SNAP_TO_ANY
+                }
+            }
+        listView.layoutManager?.startSmoothScroll(smoothScroller)
+
         listView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         listView.adapter = breedImagesAdapter

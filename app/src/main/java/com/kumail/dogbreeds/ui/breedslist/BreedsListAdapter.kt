@@ -7,9 +7,12 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kumail.dogbreeds.R
+import com.kumail.dogbreeds.data.model.BreedItem
 import com.kumail.dogbreeds.databinding.ItemBreedBinding
 import com.kumail.dogbreeds.util.enableTopDivider
 import com.kumail.dogbreeds.util.navigateTo
@@ -23,10 +26,11 @@ import javax.inject.Singleton
  */
 @Singleton
 class BreedsListAdapter @Inject constructor() :
-    RecyclerView.Adapter<BreedsListAdapter.ViewHolder>(), Filterable {
+    ListAdapter<BreedItem, BreedsListAdapter.ViewHolder>(BreedListDiffCallback),
+    Filterable {
 
-    private var breeds = emptyMap<String, List<String>>()
-    private var filterBreeds = mutableMapOf<String, List<String>>()
+    private var breeds = emptyList<BreedItem>()
+    private var filterBreeds = mutableListOf<BreedItem>()
     private var onItemClick: ((String) -> Unit)? = null
     private var expanded = false
 
@@ -39,30 +43,26 @@ class BreedsListAdapter @Inject constructor() :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = filterBreeds.entries.elementAt(position)
-        holder.bind(item.key, item.value)
-    }
-
-    override fun getItemCount(): Int {
-        return filterBreeds.size
+        val breedItem = getItem(position)
+        holder.bind(breedItem)
     }
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val charSearch = constraint.toString()
-                if (charSearch.isEmpty()) {
-                    filterBreeds = breeds.toMutableMap()
+                filterBreeds = if (charSearch.isEmpty()) {
+                    breeds.toMutableList()
                 } else {
-                    val resultList = mutableMapOf<String, List<String>>()
-                    for (row in breeds) {
-                        if (row.key.lowercase(Locale.ROOT)
+                    val resultList = mutableListOf<BreedItem>()
+                    for (item in breeds) {
+                        if (item.breed.lowercase(Locale.ROOT)
                                 .contains(charSearch.lowercase(Locale.ROOT))
                         ) {
-                            resultList[row.key] = row.value
+                            resultList.addAll(breeds.filter { it.breed == item.breed })
                         }
                     }
-                    filterBreeds = resultList
+                    resultList
                 }
                 val filterResults = FilterResults()
                 filterResults.values = filterBreeds
@@ -70,17 +70,17 @@ class BreedsListAdapter @Inject constructor() :
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                filterBreeds = results?.values as MutableMap<String, List<String>>
-                notifyDataSetChanged()
+                filterBreeds = results?.values as MutableList<BreedItem>
+                submitList(filterBreeds)
             }
         }
     }
 
-    fun setBreedsList(items: Map<String, List<String>>) {
+    fun setBreedsList(items: List<BreedItem>) {
         breeds = items
         filterBreeds.clear()
-        filterBreeds.putAll(breeds)
-        notifyDataSetChanged()
+        filterBreeds.addAll(breeds)
+        submitList(breeds)
     }
 
     fun setOnItemClickListener(onClick: (String) -> Unit) {
@@ -90,14 +90,15 @@ class BreedsListAdapter @Inject constructor() :
     inner class ViewHolder(private val binding: ItemBreedBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        @Inject
-        lateinit var subBreedsListAdapter: SubBreedsListAdapter
+        private lateinit var subBreedsListAdapter: SubBreedsListAdapter
 
         init {
             setupSubBreeds(binding.rvSubBreeds)
         }
 
-        fun bind(breed: String, subBreedList: List<String>) {
+        fun bind(breedItem: BreedItem) {
+            val breed = breedItem.breed
+            val subBreedList = breedItem.subBreed
             binding.breed = breed
 
             if (subBreedList.isNotEmpty()) {
@@ -105,7 +106,7 @@ class BreedsListAdapter @Inject constructor() :
                 binding.ivDropDownArrow.isVisible = true
                 binding.isExpanded = expanded
                 subBreedsListAdapter.setBreed(breed)
-                subBreedsListAdapter.setSubBreedsList(subBreedList)
+                subBreedsListAdapter.submitList(subBreedList)
                 binding.root.setOnClickListener {
                     if (!expanded) {
                         binding.ivDropDownArrow.rotate()
@@ -129,8 +130,7 @@ class BreedsListAdapter @Inject constructor() :
         }
 
         private fun setupSubBreeds(listView: RecyclerView) {
-            subBreedsListAdapter = SubBreedsListAdapter()
-            subBreedsListAdapter.setOnItemClickListener { breed, subBreed ->
+            subBreedsListAdapter = SubBreedsListAdapter { breed, subBreed ->
                 navigateToSubBreedImages(breed, subBreed, binding.root)
             }
             listView.layoutManager = LinearLayoutManager(binding.root.context)
@@ -146,5 +146,15 @@ class BreedsListAdapter @Inject constructor() :
                 )
             )
         }
+    }
+}
+
+object BreedListDiffCallback : DiffUtil.ItemCallback<BreedItem>() {
+    override fun areItemsTheSame(oldItem: BreedItem, newItem: BreedItem): Boolean {
+        return oldItem.breed == newItem.breed
+    }
+
+    override fun areContentsTheSame(oldItem: BreedItem, newItem: BreedItem): Boolean {
+        return oldItem == newItem
     }
 }

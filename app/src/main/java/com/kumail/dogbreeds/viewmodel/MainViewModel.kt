@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kumail.dogbreeds.data.model.BreedItem
+import com.kumail.dogbreeds.data.model.toListOfBreedItems
 import com.kumail.dogbreeds.data.repository.BreedRepository
 import com.kumail.dogbreeds.network.ApiResponse
 import com.kumail.dogbreeds.util.SingleLiveEvent
@@ -25,8 +27,8 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
     private val _errorMessage = SingleLiveEvent<String>()
     val errorMessage: SingleLiveEvent<String> = _errorMessage
 
-    private val _breedsList = MutableLiveData<Map<String, List<String>>>()
-    val breedsList: LiveData<Map<String, List<String>>> = _breedsList
+    private val _breedsList = MutableLiveData<List<BreedItem>>()
+    val breedsList: MutableLiveData<List<BreedItem>> = _breedsList
 
     private val _breedImageUrls = MutableLiveData<List<String>>()
     val breedImageUrls: LiveData<List<String>> = _breedImageUrls
@@ -38,7 +40,7 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
     private fun getBreedsList() {
         viewModelScope.launch {
             when (val result = breedRepository.getBreedsList()) {
-                is ApiResponse.Success -> _breedsList.postValue(result.data.breedsList)
+                is ApiResponse.Success -> _breedsList.postValue(result.data.breedsList.toListOfBreedItems())
                 is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
                     errorMessage.value = result.errorResponse.errorMessage

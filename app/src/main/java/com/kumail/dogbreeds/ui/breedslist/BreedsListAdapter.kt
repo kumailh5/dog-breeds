@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kumail.dogbreeds.R
 import com.kumail.dogbreeds.databinding.ItemBreedBinding
-import com.kumail.dogbreeds.util.*
+import com.kumail.dogbreeds.util.enableTopDivider
+import com.kumail.dogbreeds.util.navigateTo
+import com.kumail.dogbreeds.util.rotate
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton

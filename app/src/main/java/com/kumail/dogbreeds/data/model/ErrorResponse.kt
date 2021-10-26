@@ -11,5 +11,5 @@ data class ErrorResponse(
     @SerializedName("status")
     val status: String,
     @SerializedName("code")
-    val codes: Int
+    val code: Int
 )

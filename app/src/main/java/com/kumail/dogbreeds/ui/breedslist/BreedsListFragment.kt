@@ -2,7 +2,7 @@ package com.kumail.dogbreeds.ui.breedslist
 
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,12 +16,6 @@ import com.kumail.dogbreeds.util.showErrorDialog
 import com.kumail.dogbreeds.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import android.R.menu
-import android.app.SearchManager
-import android.content.Context
-import androidx.appcompat.widget.SearchView
-
-import androidx.core.view.MenuItemCompat
 
 
 /**
@@ -43,10 +37,8 @@ class BreedsListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_breeds_list, container, false)
+        _binding = FragmentBreedsListBinding.inflate(layoutInflater)
 
-        setupDataBinding()
         this.setToolbarTitle(getString(R.string.app_name))
         setupBreedsList(binding.rvBreeds)
         setHasOptionsMenu(true)
@@ -78,10 +70,6 @@ class BreedsListFragment : Fragment() {
             }
         })
         return super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    private fun setupDataBinding() {
-        binding.lifecycleOwner = viewLifecycleOwner
     }
 
     private fun setupObservers() {

@@ -37,20 +37,16 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
 
     private fun getBreedsList() {
         viewModelScope.launch {
-            breedRepository.getBreedsList().let {
-                when (val result = breedRepository.getBreedsList()) {
-                    is ApiResponse.Success -> _breedsList.postValue(result.data.breedsList)
-                    is ApiResponse.Empty -> {
-                        Timber.d(result.toString())
-                    }
-                    is ApiResponse.NetworkError -> {
-                        errorMessage.value = result.errorResponse.errorMessage
-                        Timber.e(result.errorResponse.toString())
-                    }
-                    is ApiResponse.ExceptionError -> {
-                        errorMessage.value = result.errorResponse.message
-                        Timber.e(result.errorResponse.toString())
-                    }
+            when (val result = breedRepository.getBreedsList()) {
+                is ApiResponse.Success -> _breedsList.postValue(result.data.breedsList)
+                is ApiResponse.Empty -> Timber.d(result.toString())
+                is ApiResponse.NetworkError -> {
+                    errorMessage.value = result.errorResponse.errorMessage
+                    Timber.e(result.errorResponse.toString())
+                }
+                is ApiResponse.ExceptionError -> {
+                    errorMessage.value = result.errorResponse.message
+                    Timber.e(result.errorResponse.toString())
                 }
             }
         }
@@ -61,9 +57,7 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
         viewModelScope.launch {
             when (val result = breedRepository.getBreedRandomImages(breed)) {
                 is ApiResponse.Success -> _breedImageUrls.postValue(result.data.breedImageUrls)
-                is ApiResponse.Empty -> {
-                    Timber.d(result.toString())
-                }
+                is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
                     errorMessage.value = result.errorResponse.errorMessage
                     Timber.e(result.errorResponse.toString())
@@ -82,9 +76,7 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
         viewModelScope.launch {
             when (val result = breedRepository.getSubBreedRandomImages(breed, subBreed)) {
                 is ApiResponse.Success -> _breedImageUrls.postValue(result.data.breedImageUrls)
-                is ApiResponse.Empty -> {
-                    Timber.d(result.toString())
-                }
+                is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
                     errorMessage.value = result.errorResponse.errorMessage
                     Timber.e(result.errorResponse.toString())

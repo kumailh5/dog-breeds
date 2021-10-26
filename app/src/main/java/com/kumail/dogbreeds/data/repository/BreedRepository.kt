@@ -3,9 +3,6 @@ package com.kumail.dogbreeds.data.repository
 import com.kumail.dogbreeds.data.model.BreedImagesResponse
 import com.kumail.dogbreeds.data.model.BreedsListResponse
 import com.kumail.dogbreeds.network.ApiResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
 
 /**
@@ -26,37 +23,31 @@ class BreedRepositoryImpl @Inject constructor(private val breedApi: BreedApi) :
     BreedRepository {
 
     override suspend fun getBreedsList(): ApiResponse<BreedsListResponse> =
-        withContext(Dispatchers.IO) {
-            try {
-                ApiResponse.create(breedApi.getBreedsList())
-            } catch (e: Exception) {
-                ApiResponse.ExceptionError(e)
-            }
+        try {
+            ApiResponse.create(breedApi.getBreedsList())
+        } catch (e: Exception) {
+            ApiResponse.ExceptionError(e)
         }
 
     override suspend fun getBreedRandomImages(breed: String): ApiResponse<BreedImagesResponse> =
-        withContext(Dispatchers.IO) {
-            try {
-                ApiResponse.create(breedApi.getBreedRandomImages(breed))
-            } catch (e: Exception) {
-                ApiResponse.ExceptionError(e)
-            }
+        try {
+            ApiResponse.create(breedApi.getBreedRandomImages(breed))
+        } catch (e: Exception) {
+            ApiResponse.ExceptionError(e)
         }
 
     override suspend fun getSubBreedRandomImages(
         breed: String,
         subBreed: String
     ): ApiResponse<BreedImagesResponse> =
-        withContext(Dispatchers.IO) {
-            try {
-                ApiResponse.create(
-                    breedApi.getSubBreedRandomImages(
-                        breed,
-                        subBreed
-                    )
+        try {
+            ApiResponse.create(
+                breedApi.getSubBreedRandomImages(
+                    breed,
+                    subBreed
                 )
-            } catch (e: Exception) {
-                ApiResponse.ExceptionError(e)
-            }
+            )
+        } catch (e: Exception) {
+            ApiResponse.ExceptionError(e)
         }
 }

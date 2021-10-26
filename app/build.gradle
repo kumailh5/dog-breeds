@@ -37,6 +37,7 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
+        viewBinding true
         dataBinding true
     }
     testOptions {
@@ -78,13 +79,14 @@ dependencies {
     /*Testing*/
     testImplementation "junit:junit:${versions.junit}"
     testImplementation "org.robolectric:robolectric:${versions.roboelectric}"
-    testImplementation "androidx.test:core:${versions.testCore}"
-    testImplementation "androidx.arch.core:core-testing:${versions.core_testing}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
     testImplementation "org.mockito:mockito-inline:${versions.mockito_inline}"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
 
     // AndroidX Test - JVM testing
+    testImplementation "androidx.test:core:${versions.testCore}"
     testImplementation "androidx.test:core-ktx:${versions.testCore}"
+    testImplementation "androidx.arch.core:core-testing:${versions.core_testing}"
     testImplementation "androidx.test.ext:junit:${versions.extJunit}"
 
     androidTestImplementation "androidx.test.ext:junit:${versions.extJunit}"

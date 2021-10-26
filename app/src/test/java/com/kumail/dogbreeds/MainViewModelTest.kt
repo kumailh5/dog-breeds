@@ -4,8 +4,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.kumail.dogbreeds.data.model.BreedImagesResponse
+import com.kumail.dogbreeds.data.model.BreedsListResponse
+import com.kumail.dogbreeds.data.model.ErrorResponse
 import com.kumail.dogbreeds.data.repository.BreedRepository
+import com.kumail.dogbreeds.network.ApiResponse
 import com.kumail.dogbreeds.viewmodel.MainViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -15,9 +23,11 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
+
 /**
  * Created by kumailhussain on 14/10/2021.
  */
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class MainViewModelTest {
 
@@ -25,22 +35,25 @@ class MainViewModelTest {
     private lateinit var viewModel: MainViewModel
 
     @Mock
-    private lateinit var repositoryImpl: BreedRepository
+    private lateinit var repository: BreedRepository
 
     @Mock
     private lateinit var isLoadingLiveData: LiveData<Boolean>
 
     @Mock
-    private lateinit var observer: Observer<Boolean>
+    private lateinit var observer: Observer<Any>
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var testCoroutineRule = TestCoroutineRule()
 
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        viewModel = spy(MainViewModel(repositoryImpl))
+        viewModel = spy(MainViewModel(repository))
         isLoadingLiveData = viewModel.isLoading
     }
 
@@ -62,4 +75,120 @@ class MainViewModelTest {
         assertNotNull(isLoading)
         isLoading?.let { assertFalse(it) }
     }
+
+    @Test
+    fun `Verify breeds list being mapped on event`() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.getBreedsList()).thenReturn(mockBreedsListResponse)
+            viewModel = MainViewModel(repository)
+            assertThat(
+                mockBreedsListResponse.data.breedsList,
+                (equalTo(viewModel.breedsList.getOrAwaitValue()))
+            )
+        }
+    }
+
+    @Test
+    fun `Verify breed images being mapped on event`() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.getBreedRandomImages("husky")).thenReturn(mockBreedImagesResponse)
+            viewModel.getBreedRandomImages("husky")
+            assertThat(
+                mockBreedImagesResponse.data.breedImageUrls,
+                (equalTo(viewModel.breedImageUrls.getOrAwaitValue()))
+            )
+        }
+    }
+
+    @Test
+    fun `Verify sub-breed images being mapped on event`() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.getSubBreedRandomImages("australian", "shepherd")).thenReturn(
+                mockSubBreedsListResponse
+            )
+            viewModel.getSubBreedRandomImages("australian", "shepherd")
+            assertThat(
+                mockSubBreedsListResponse.data.breedImageUrls,
+                equalTo(viewModel.breedImageUrls.getOrAwaitValue())
+            )
+        }
+    }
+
+    @Test
+    fun `Verify breed error response on event`() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.getBreedRandomImages("husk")).thenReturn(mockErrorResponse as ApiResponse<BreedImagesResponse>)
+            viewModel.getBreedRandomImages("husk")
+            assertThat(
+                mockErrorResponse.errorResponse.errorMessage,
+                equalTo(viewModel.errorMessage.getOrAwaitValue())
+            )
+        }
+    }
+
+    @Test
+    fun `Verify sub-breed error response on event`() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.getSubBreedRandomImages("australian", "shep")).thenReturn(
+                mockErrorResponse as ApiResponse<BreedImagesResponse>
+            )
+            viewModel.getSubBreedRandomImages("australian", "shep")
+            assertThat(
+                mockErrorResponse.errorResponse.errorMessage,
+                equalTo(viewModel.errorMessage.getOrAwaitValue())
+            )
+        }
+    }
+
+    private val mockBreedsListResponse = ApiResponse.Success(
+        BreedsListResponse(
+            mapOf(
+                "affenpinscher" to emptyList(),
+                "australian" to listOf("shepherd"),
+                "boxer" to emptyList(),
+                "brabancon" to emptyList(),
+                "bulldog" to listOf("boston", "english", "french"),
+                "corgi" to listOf("cardigan"),
+                "dane" to listOf("great"),
+                "husky" to emptyList()
+            ), "success"
+        )
+    )
+
+    private val mockBreedImagesResponse = ApiResponse.Success(
+        BreedImagesResponse(
+            listOf(
+                "https://images.dog.ceo/breeds/husky/n02110185_10875.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_11396.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_12656.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_1439.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_15019.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_1552.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_56.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_5871.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_7564.jpg",
+                "https://images.dog.ceo/breeds/husky/n02110185_8360.jpg"
+            ), "success"
+        )
+    )
+
+    private val mockSubBreedsListResponse = ApiResponse.Success(
+        BreedImagesResponse(
+            listOf(
+                "https://images.dog.ceo/breeds/australian-shepherd/leroy.jpg",
+                "https://images.dog.ceo/breeds/australian-shepherd/pepper.jpg",
+                "https://images.dog.ceo/breeds/australian-shepherd/pepper2.jpg",
+                "https://images.dog.ceo/breeds/australian-shepherd/sadie.jpg"
+            ), "success"
+        )
+    )
+
+    private val mockErrorResponse =
+        ApiResponse.NetworkError<ErrorResponse>(
+            ErrorResponse(
+                "Breed not found (master breed does not exist)",
+                "error",
+                404
+            )
+        )
 }

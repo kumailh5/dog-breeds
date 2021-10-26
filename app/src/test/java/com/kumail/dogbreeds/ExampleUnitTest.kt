@@ -1,9 +1,7 @@
 package com.kumail.dogbreeds
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
-import retrofit2.Response
 
 /**
  * Example local unit test, which will execute on the development machine (host).

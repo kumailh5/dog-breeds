@@ -1,5 +1,6 @@
 package com.kumail.dogbreeds.viewmodel
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,17 +38,18 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
         getBreedsList()
     }
 
-    private fun getBreedsList() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getBreedsList() {
         viewModelScope.launch {
             when (val result = breedRepository.getBreedsList()) {
                 is ApiResponse.Success -> _breedsList.postValue(result.data.breedsList.toListOfBreedItems())
                 is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
-                    errorMessage.value = result.errorResponse.errorMessage
+                    _errorMessage.postValue(result.errorResponse.errorMessage)
                     Timber.e(result.errorResponse.toString())
                 }
                 is ApiResponse.ExceptionError -> {
-                    errorMessage.value = result.errorResponse.message
+                    _errorMessage.postValue(result.errorResponse.message)
                     Timber.e(result.errorResponse.toString())
                 }
             }
@@ -55,40 +57,40 @@ class MainViewModel @Inject internal constructor(private val breedRepository: Br
     }
 
     fun getBreedRandomImages(breed: String) {
-        _isLoading.postValue(true)
+        _isLoading.value = true
         viewModelScope.launch {
             when (val result = breedRepository.getBreedRandomImages(breed)) {
                 is ApiResponse.Success -> _breedImageUrls.postValue(result.data.breedImageUrls)
                 is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
-                    errorMessage.value = result.errorResponse.errorMessage
+                    _errorMessage.postValue(result.errorResponse.errorMessage)
                     Timber.e(result.errorResponse.toString())
                 }
                 is ApiResponse.ExceptionError -> {
-                    errorMessage.value = result.errorResponse.message
+                    _errorMessage.postValue(result.errorResponse.message)
                     Timber.e(result.errorResponse.toString())
                 }
             }
-            _isLoading.postValue(false)
+            _isLoading.value = false
         }
     }
 
     fun getSubBreedRandomImages(breed: String, subBreed: String) {
-        _isLoading.postValue(true)
+        _isLoading.value = true
         viewModelScope.launch {
             when (val result = breedRepository.getSubBreedRandomImages(breed, subBreed)) {
                 is ApiResponse.Success -> _breedImageUrls.postValue(result.data.breedImageUrls)
                 is ApiResponse.Empty -> Timber.d(result.toString())
                 is ApiResponse.NetworkError -> {
-                    errorMessage.value = result.errorResponse.errorMessage
+                    _errorMessage.postValue(result.errorResponse.errorMessage)
                     Timber.e(result.errorResponse.toString())
                 }
                 is ApiResponse.ExceptionError -> {
-                    errorMessage.value = result.errorResponse.message
+                    _errorMessage.postValue(result.errorResponse.message)
                     Timber.e(result.errorResponse.toString())
                 }
             }
-            _isLoading.postValue(false)
+            _isLoading.value = false
         }
     }
 }

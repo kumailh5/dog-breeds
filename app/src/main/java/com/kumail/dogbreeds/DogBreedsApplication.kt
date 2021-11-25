@@ -10,9 +10,14 @@ import timber.log.Timber
 @HiltAndroidApp
 class DogBreedsApplication : Application() {
 
+    companion object {
+        lateinit var instance: DogBreedsApplication private set
+    }
+
     override fun onCreate() {
         super.onCreate()
         setupTimber()
+        instance = this
     }
 
     private fun setupTimber() {

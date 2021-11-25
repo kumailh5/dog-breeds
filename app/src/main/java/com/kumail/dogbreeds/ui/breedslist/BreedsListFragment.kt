@@ -73,8 +73,8 @@ class BreedsListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        mainViewModel.errorMessage.observe(viewLifecycleOwner, { errorRes ->
-            showErrorDialog(requireContext(), errorRes)
+        mainViewModel.errorMessage.observe(viewLifecycleOwner, { errorMessage ->
+            showErrorDialog(requireContext(), errorMessage)
         })
 
         mainViewModel.breedsList.observe(viewLifecycleOwner, {

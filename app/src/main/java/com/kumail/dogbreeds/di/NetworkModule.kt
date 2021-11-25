@@ -3,6 +3,7 @@ package com.kumail.dogbreeds.di
 import com.kumail.dogbreeds.BuildConfig
 import com.kumail.dogbreeds.data.repository.BreedApi
 import com.kumail.dogbreeds.util.BASE_URL
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,7 +11,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 /**
@@ -23,8 +24,12 @@ class NetworkModule {
     @Provides
     fun provideBaseUrl() = BASE_URL
 
-    @Provides
     @Singleton
+    @Provides
+    fun providesMoshi(): Moshi = Moshi.Builder().build()
+
+    @Singleton
+    @Provides
     fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -37,16 +42,17 @@ class NetworkModule {
             .build()
     }
 
-    @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, BASE_URL: String): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .build()
+    @Provides
+    fun provideRetrofit(moshi: Moshi, okHttpClient: OkHttpClient, baseUrl: String): Retrofit =
+        Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .build()
 
-    @Provides
     @Singleton
+    @Provides
     fun provideBreedApi(retrofit: Retrofit): BreedApi =
         retrofit.create(BreedApi::class.java)
 }

@@ -20,7 +20,6 @@ import com.kumail.dogbreeds.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-
 /**
  * Created by kumailhussain on 12/10/2021.
  */
@@ -70,8 +69,8 @@ class BreedImagesFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        mainViewModel.errorMessage.observe(viewLifecycleOwner, { errorRes ->
-            showErrorDialog(requireContext(), errorRes)
+        mainViewModel.errorMessage.observe(viewLifecycleOwner, { errorMessage ->
+            showErrorDialog(requireContext(), errorMessage)
         })
 
         if (args.subBreed == null) {

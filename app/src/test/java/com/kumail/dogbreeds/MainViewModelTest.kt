@@ -7,12 +7,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kumail.dogbreeds.data.model.BreedImagesResponse
 import com.kumail.dogbreeds.data.model.BreedsListResponse
 import com.kumail.dogbreeds.data.model.ErrorResponse
+import com.kumail.dogbreeds.data.model.toListOfBreedItems
 import com.kumail.dogbreeds.data.repository.BreedRepository
 import com.kumail.dogbreeds.network.ApiResponse
+import com.kumail.dogbreeds.util.TestCoroutineRule
+import com.kumail.dogbreeds.util.getOrAwaitValue
 import com.kumail.dogbreeds.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.Is.`is`
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.*
 import org.junit.Before
@@ -20,13 +24,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
-
+import org.robolectric.annotation.Config
 
 /**
  * Created by kumailhussain on 14/10/2021.
  */
+@Config(sdk = [30])
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class MainViewModelTest {
@@ -51,9 +57,9 @@ class MainViewModelTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
-        viewModel = spy(MainViewModel(repository))
+        viewModel = MainViewModel(repository)
         isLoadingLiveData = viewModel.isLoading
     }
 
@@ -77,67 +83,66 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `Verify breeds list being mapped on event`() {
-        testCoroutineRule.runBlockingTest {
-            `when`(repository.getBreedsList()).thenReturn(mockBreedsListResponse)
-            viewModel = MainViewModel(repository)
-            assertThat(
-                mockBreedsListResponse.data.breedsList,
-                (equalTo(viewModel.breedsList.getOrAwaitValue()))
-            )
-        }
+    fun `Assert loading values are correct fetching breed images`() {
+        testCoroutineRule.pauseDispatcher()
+        viewModel.getBreedRandomImages("husky")
+        assertThat(viewModel.isLoading.getOrAwaitValue(), `is`(true))
+        testCoroutineRule.resumeDispatcher()
+        assertThat(viewModel.isLoading.getOrAwaitValue(), `is`(false))
     }
 
     @Test
-    fun `Verify breed images being mapped on event`() {
-        testCoroutineRule.runBlockingTest {
-            `when`(repository.getBreedRandomImages("husky")).thenReturn(mockBreedImagesResponse)
-            viewModel.getBreedRandomImages("husky")
-            assertThat(
-                mockBreedImagesResponse.data.breedImageUrls,
-                (equalTo(viewModel.breedImageUrls.getOrAwaitValue()))
-            )
-        }
+    fun `Verify breeds list being mapped on event`() = testCoroutineRule.runBlockingTest {
+        `when`(repository.getBreedsList()).thenReturn(mockBreedsListResponse)
+        viewModel.getBreedsList()
+        assertThat(
+            mockBreedsListResponse.data.breedsList.toListOfBreedItems(),
+            (equalTo(viewModel.breedsList.getOrAwaitValue()))
+        )
     }
 
     @Test
-    fun `Verify sub-breed images being mapped on event`() {
-        testCoroutineRule.runBlockingTest {
-            `when`(repository.getSubBreedRandomImages("australian", "shepherd")).thenReturn(
-                mockSubBreedsListResponse
-            )
-            viewModel.getSubBreedRandomImages("australian", "shepherd")
-            assertThat(
-                mockSubBreedsListResponse.data.breedImageUrls,
-                equalTo(viewModel.breedImageUrls.getOrAwaitValue())
-            )
-        }
+    fun `Verify breed images being mapped on event`() = testCoroutineRule.runBlockingTest {
+        `when`(repository.getBreedRandomImages("husky")).thenReturn(mockBreedImagesResponse)
+        viewModel.getBreedRandomImages("husky")
+        assertThat(
+            mockBreedImagesResponse.data.breedImageUrls,
+            `is`(viewModel.breedImageUrls.getOrAwaitValue())
+        )
     }
 
     @Test
-    fun `Verify breed error response on event`() {
-        testCoroutineRule.runBlockingTest {
-            `when`(repository.getBreedRandomImages("husk")).thenReturn(mockErrorResponse as ApiResponse<BreedImagesResponse>)
-            viewModel.getBreedRandomImages("husk")
-            assertThat(
-                mockErrorResponse.errorResponse.errorMessage,
-                equalTo(viewModel.errorMessage.getOrAwaitValue())
-            )
-        }
+    fun `Verify sub-breed images being mapped on event`() = testCoroutineRule.runBlockingTest {
+        `when`(repository.getSubBreedRandomImages("australian", "shepherd")).thenReturn(
+            mockSubBreedsListResponse
+        )
+        viewModel.getSubBreedRandomImages("australian", "shepherd")
+        assertThat(
+            mockSubBreedsListResponse.data.breedImageUrls,
+            equalTo(viewModel.breedImageUrls.getOrAwaitValue())
+        )
     }
 
     @Test
-    fun `Verify sub-breed error response on event`() {
-        testCoroutineRule.runBlockingTest {
-            `when`(repository.getSubBreedRandomImages("australian", "shep")).thenReturn(
-                mockErrorResponse as ApiResponse<BreedImagesResponse>
-            )
-            viewModel.getSubBreedRandomImages("australian", "shep")
-            assertThat(
-                mockErrorResponse.errorResponse.errorMessage,
-                equalTo(viewModel.errorMessage.getOrAwaitValue())
-            )
-        }
+    fun `Verify breed error response on event`() = testCoroutineRule.runBlockingTest {
+        `when`(repository.getBreedRandomImages("husk")).thenReturn(mockErrorResponse as ApiResponse<BreedImagesResponse>)
+        viewModel.getBreedRandomImages("husk")
+        assertThat(
+            mockErrorResponse.errorResponse.errorMessage,
+            equalTo(viewModel.errorMessage.getOrAwaitValue())
+        )
+    }
+
+    @Test
+    fun `Verify sub-breed error response on event`() = testCoroutineRule.runBlockingTest {
+        `when`(repository.getSubBreedRandomImages("australian", "shep")).thenReturn(
+            mockErrorResponse as ApiResponse<BreedImagesResponse>
+        )
+        viewModel.getSubBreedRandomImages("australian", "shep")
+        assertThat(
+            mockErrorResponse.errorResponse.errorMessage,
+            equalTo(viewModel.errorMessage.getOrAwaitValue())
+        )
     }
 
     private val mockBreedsListResponse = ApiResponse.Success(

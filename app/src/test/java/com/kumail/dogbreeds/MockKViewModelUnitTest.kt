@@ -52,4 +52,16 @@ class MockKViewModelUnitTest {
             `is`(viewModel.breedsList.getOrAwaitValue())
         )
     }
+
+    @Test
+    fun `Verify breeds list error event`() {
+        val errorResponseModel = testModelsGenerator.generateBreedsListErrorResponse()
+        coEvery { repository.getBreedsList() } returns (ApiResponse.NetworkError(errorResponseModel))
+        viewModel = MainViewModel(repository)
+        viewModel.getBreedsList()
+        assertThat(
+            errorResponseModel.errorMessage,
+            `is`(viewModel.errorMessage.getOrAwaitValue())
+        )
+    }
 }

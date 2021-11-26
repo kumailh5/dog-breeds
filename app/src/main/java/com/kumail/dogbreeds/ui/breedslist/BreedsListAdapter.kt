@@ -34,13 +34,14 @@ class BreedsListAdapter @Inject constructor() :
     private var onItemClick: ((String) -> Unit)? = null
     private var expanded = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            DataBindingUtil.inflate(
-                LayoutInflater.from(parent.context), R.layout.item_breed, parent, false
-            )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
+        DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.item_breed,
+            parent,
+            false
         )
-    }
+    )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val breedItem = getItem(position)

@@ -1,13 +1,15 @@
 package com.kumail.dogbreeds.data.model
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Created by kumailhussain on 12/10/2021.
  */
+@JsonClass(generateAdapter = true)
 data class BreedImagesResponse(
-    @SerializedName("message")
+    @Json(name = "message")
     val breedImageUrls: List<String>,
-    @SerializedName("status")
+    @Json(name = "status")
     val status: String
 )

@@ -1,15 +1,24 @@
 package com.kumail.dogbreeds.data.model
 
-import com.google.gson.annotations.SerializedName
+import com.kumail.dogbreeds.R
+import com.kumail.dogbreeds.util.Strings
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Created by kumailhussain on 14/10/2021.
  */
+@JsonClass(generateAdapter = true)
 data class ErrorResponse(
-    @SerializedName("message")
+    @Json(name = "message")
     val errorMessage: String,
-    @SerializedName("status")
+    @Json(name = "status")
     val status: String,
-    @SerializedName("code")
+    @Json(name = "code")
     val code: Int
-)
+) {
+    constructor() : this(
+        Strings.get(R.string.error_something_went_wrong),
+        Strings.get(R.string.error), 0
+    )
+}

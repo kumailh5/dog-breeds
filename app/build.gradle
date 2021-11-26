@@ -43,10 +43,18 @@ android {
     testOptions {
         unitTests.includeAndroidResources = true
     }
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/resources'
+        test {
+            resources.srcDirs += sharedTestDir
+        }
+        androidTest {
+            resources.srcDirs += sharedTestDir
+        }
+    }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.core_ktx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "com.google.android.material:material:${versions.material}"
@@ -56,10 +64,12 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
 
-    /*Retrofit*/
+    /*Retrofit, OkHttp and Moshi*/
     implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
-    implementation "com.squareup.retrofit2:converter-gson:${versions.retrofit}"
+    implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
     implementation "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
+    implementation "com.squareup.moshi:moshi:${versions.moshi}"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:${versions.moshi}"
 
     /*ViewModel and LiveData*/
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.viewmodel_ktx}"
@@ -81,6 +91,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:${versions.roboelectric}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
     testImplementation "org.mockito:mockito-inline:${versions.mockito_inline}"
+    testImplementation "io.mockk:mockk:${versions.mockk}"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
 
     // AndroidX Test - JVM testing

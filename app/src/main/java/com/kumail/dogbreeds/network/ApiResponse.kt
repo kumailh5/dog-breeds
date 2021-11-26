@@ -30,8 +30,8 @@ sealed class ApiResponse<T> {
         }
     }
 
-    class Success<T>(val data: T) : ApiResponse<T>()
-    class Empty<T> : ApiResponse<T>()
-    class NetworkError<T>(val errorResponse: ErrorResponse) : ApiResponse<T>()
-    class ExceptionError<T>(val errorResponse: Exception) : ApiResponse<T>()
+    data class Success<T>(val data: T) : ApiResponse<T>()
+    data class Empty<T>(val data: T? = null) : ApiResponse<T>()
+    data class NetworkError<T>(val errorResponse: ErrorResponse) : ApiResponse<T>()
+    data class ExceptionError<T>(val errorResponse: Exception) : ApiResponse<T>()
 }

@@ -1,10 +1,9 @@
 package com.kumail.dogbreeds.util
 
+import android.view.View
 import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import timber.log.Timber
 
@@ -30,12 +29,7 @@ fun ImageView.loadImage(url: String?) {
 }
 
 @BindingAdapter("setVisibility")
-fun RecyclerView.setVisibility(isVisible: Boolean) {
-    this.isVisible = isVisible
-}
-
-@BindingAdapter("setVisibility")
-fun ProgressBar.setVisibility(isVisible: Boolean) {
+fun View.setVisibility(isVisible: Boolean) {
     this.isVisible = isVisible
 }
 
